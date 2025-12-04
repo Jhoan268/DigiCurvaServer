@@ -1,6 +1,9 @@
 # DigiCurvaServer
 
+# 🛒 Marketplace Digital (Esquema de Base de Datos y API)
 
+Este repositorio contiene el esquema de la base de datos MySQL para la plataforma de Marketplace, diseñada para manejar usuarios, productos, ventas (pedidos), logística (repartidores), y gestión de ofertas/anuncios.
+```
 classDiagram
     direction LR
 
@@ -100,3 +103,4 @@ classDiagram
 
     Usuario "1" --> "0..*" Carrito_Compra : tiene
     Producto "1" --> "0..*" Carrito_Compra : incluido en
+``
