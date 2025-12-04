@@ -1,0 +1,71 @@
+<?php
+// Encabezados para permitir solicitudes desde cualquier origen (CORS) y definir tipo de contenido
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: POST");
+header("Access-Control-Allow-Headers: Content-Type");
+header("Content-Type: application/json");
+
+// Habilitar reporte de errores de MySQLi para facilitar depuración
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+
+// Parámetros de conexión a la base de datos
+$server = 'localhost';
+$user = 'droa';
+$password = 'droaPluving$1';
+$database = 'marketplace';
+
+// Establecer conexión con la base de datos
+$conex = mysqli_connect($server, $user, $password, $database);
+
+// Verificar si la conexión fue exitosa
+if (!$conex) {
+    echo json_encode(['resultado' => "La conexión falló: " . mysqli_connect_error()]);
+    exit();
+}
+
+// ✅ Obtener y sanitizar datos del formulario (POST)
+$usuario_id = filter_input(INPUT_POST, 'usuario_id', FILTER_VALIDATE_INT);
+$titulo = filter_input(INPUT_POST, 'titulo', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+$mensaje = filter_input(INPUT_POST, 'mensaje', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+$fecha_inicio = filter_input(INPUT_POST, 'fecha_inicio', FILTER_SANITIZE_STRING);
+$fecha_fin = filter_input(INPUT_POST, 'fecha_fin', FILTER_SANITIZE_STRING);
+$costo = filter_input(INPUT_POST, 'costo', FILTER_VALIDATE_FLOAT);
+
+// ✅ Validar que los campos obligatorios estén presentes y sean válidos
+if (!$usuario_id) {
+    echo json_encode(['resultado' => "El campo 'usuario_id' es obligatorio o inválido"]);
+    exit();
+}
+if (!$titulo) {
+    echo json_encode(['resultado' => "El campo 'titulo' es obligatorio o inválido"]);
+    exit();
+}
+if (!$mensaje) {
+    echo json_encode(['resultado' => "El campo 'mensaje' es obligatorio o inválido"]);
+    exit();
+}
+if (!$fecha_inicio) {
+    echo json_encode(['resultado' => "El campo 'fecha_inicio' es obligatorio o inválido"]);
+    exit();
+}
+if (!$fecha_fin) {
+    echo json_encode(['resultado' => "El campo 'fecha_fin' es obligatorio o inválido"]);
+    exit();
+}
+if ($costo === false || $costo < 0) {
+    echo json_encode(['resultado' => "El campo 'costo' es obligatorio o inválido"]);
+    exit();
+}
+
+// ✅ Preparar e insertar los datos del nuevo anuncio en la base de datos
+$stmt = $conex->prepare("INSERT INTO anuncio (usuario_id, titulo, mensaje, fecha_inicio, fecha_fin, costo) VALUES (?, ?, ?, ?, ?, ?)");
+$stmt->bind_param("issssd", $usuario_id, $titulo, $mensaje, $fecha_inicio, $fecha_fin, $costo);
+$stmt->execute();
+$stmt->close();
+
+// ✅ Responder con mensaje de éxito
+echo json_encode(['resultado' => 'Anuncio publicado exitosamente']);
+
+// ✅ Cerrar conexión a la base de datos
+$conex->close();
+?>
