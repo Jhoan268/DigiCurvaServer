@@ -30,7 +30,7 @@ $correo = filter_input(INPUT_POST, 'correo', FILTER_VALIDATE_EMAIL);
 $contrasena = filter_input(INPUT_POST, 'contrasena_hash', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 $direccion = filter_input(INPUT_POST, 'direccion', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 $telefono = filter_input(INPUT_POST, 'telefono', FILTER_SANITIZE_NUMBER_INT);
-$foto_perfil_url = "http://localhost/php/generador_formularios_php.html"; //filter_input(INPUT_POST, 'foto_perfil_url', FILTER_SANITIZE_URL);
+$foto_perfil_url = filter_input(INPUT_POST, 'foto_perfil_url', FILTER_SANITIZE_URL);
 
 // Inicializar karma en 0 por defecto
 $karma = 0;
@@ -62,6 +62,10 @@ if (!$telefono) {
     exit();
 }
 
+if (!$foto_perfil_url) {
+    $foto_perfil_url = 'https://storage.googleapis.com/mi-proyecto-uploads-digicurva/perfil_defaul.png';
+}
+
 // ✅ Generar hash seguro de la contraseña
 
 $contrasena_hash = password_hash($contrasena, PASSWORD_DEFAULT);
@@ -80,4 +84,5 @@ echo json_encode(['resultado' => 'Registro exitoso']);
 // ✅ Cerrar conexión a la base de datos
 
 $conex->close();
+
 ?>
