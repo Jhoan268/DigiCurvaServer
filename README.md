@@ -103,4 +103,3 @@ classDiagram
 
     Usuario "1" --> "0..*" Carrito_Compra : tiene
     Producto "1" --> "0..*" Carrito_Compra : incluido en
-``
