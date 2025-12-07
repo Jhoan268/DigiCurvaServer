@@ -30,6 +30,8 @@ $mensaje = filter_input(INPUT_POST, 'mensaje', FILTER_SANITIZE_FULL_SPECIAL_CHAR
 $fecha_inicio = filter_input(INPUT_POST, 'fecha_inicio', FILTER_SANITIZE_STRING);
 $fecha_fin = filter_input(INPUT_POST, 'fecha_fin', FILTER_SANITIZE_STRING);
 $costo = filter_input(INPUT_POST, 'costo', FILTER_VALIDATE_FLOAT);
+$status = "esperando pago";
+$id_transaccion = "123456789ABCD"; //ESPERANDO CONFIGURACION DE CUENTAS DE PAYPAL Y MERCADO PAGO
 
 // ✅ Validar que los campos obligatorios estén presentes y sean válidos
 if (!$usuario_id) {
@@ -58,8 +60,8 @@ if ($costo === false || $costo < 0) {
 }
 
 // ✅ Preparar e insertar los datos del nuevo anuncio en la base de datos
-$stmt = $conex->prepare("INSERT INTO anuncio (usuario_id, titulo, mensaje, fecha_inicio, fecha_fin, costo) VALUES (?, ?, ?, ?, ?, ?)");
-$stmt->bind_param("issssd", $usuario_id, $titulo, $mensaje, $fecha_inicio, $fecha_fin, $costo);
+$stmt = $conex->prepare("INSERT INTO anuncio (usuario_id, titulo, mensaje, fecha_inicio, fecha_fin, costo, status, id_transaccion) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+$stmt->bind_param("issssd", $usuario_id, $titulo, $mensaje, $fecha_inicio, $fecha_fin, $costo, $status, $id_transaccion);
 $stmt->execute();
 $stmt->close();
 
@@ -68,4 +70,5 @@ echo json_encode(['resultado' => 'Anuncio publicado exitosamente']);
 
 // ✅ Cerrar conexión a la base de datos
 $conex->close();
+
 ?>
