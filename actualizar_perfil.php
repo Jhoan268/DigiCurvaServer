@@ -5,10 +5,31 @@ header("Access-Control-Allow-Headers: Content-Type");
 header("Content-Type: application/json");
 
 // Conexión a la base de datos
-$user = 'droa';
-$server = 'localhost';
-$database = 'marketplace';
-$password = 'droaPluving$1';
+/**
+ * La contraseña será cambiada por motivos de seguridad,
+ * ahora el acceso será definido por un config.json
+ * se deberá implementar la nueva lógica de acceso.
+ * Si tienes alguna duda Jhoan la contraseña para ti 
+ * en tu base de datos local será sin contraseña y el usuario
+ * root.
+ * Elimina este comentario una vez implementado.
+ */
+//Logica de acceso desde config.json
+// 1. Leer el archivo JSON
+$jsonString = file_get_contents('config.json');
+// 2. Decodificar el JSON en un array asociativo
+$data = json_decode($jsonString, true);
+// 3. Asignar las variables
+$user = $data["username"];
+$server = $data["host"];
+$database = $data["database"];
+$password = $data["password"];
+/**
+ * como ves las variables de arriba cambiaron un poco debido
+ * a la nueva implementación de seguridad, has esto con todos
+ * los php y elimina estos comentarios de documentación.
+ */
+ // Ejemplos de comentarios de documentación:" /** todo lo que esta entre estos simbolos */ "
 $conex = mysqli_connect($server, $user, $password, $database);
 
 if (!$conex) {

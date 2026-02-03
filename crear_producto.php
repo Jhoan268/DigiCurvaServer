@@ -4,7 +4,15 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Headers: Content-Type");
 header("Content-Type: application/json");
-
+/**
+ * La contraseña será cambiada por motivos de seguridad,
+ * ahora el acceso será definido por un config.json
+ * se deberá implementar la nueva lógica de acceso.
+ * Si tienes alguna duda Jhoan la contraseña para ti 
+ * en tu base de datos local será sin contraseña y el usuario
+ * root.
+ * Elimina este comentario una vez implementado.
+ */
 // Habilitar reporte de errores de MySQLi para facilitar depuración
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
