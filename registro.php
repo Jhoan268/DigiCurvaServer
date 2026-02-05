@@ -75,7 +75,10 @@ if (!$foto_perfil_url) {
 }
 
 // ✅ Generar hash seguro de la contraseña
-
+/**
+ * estas contraseñas hash de php son seguras y tienen una longitud fija de 60 caracteres 
+ * sin importar el tamaño de la contraseña original de la contraseña o lo poco segura que sea.
+ */
 $contrasena_hash = password_hash($contrasena_hash, PASSWORD_DEFAULT);
 
 // ✅ Preparar e insertar los datos del nuevo usuario en la base de datos

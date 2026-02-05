@@ -38,7 +38,6 @@ if (!$correo || !$contrasena) {
     echo json_encode(['error' => 'Correo o contraseña inválidos']);
     exit();
 }
-
 // ✅ Buscar usuario por correo
 $stmt = $conex->prepare("SELECT usuario_id, contrasena_hash FROM usuario WHERE correo = ?");
 $stmt->bind_param("s", $correo);
