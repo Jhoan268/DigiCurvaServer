@@ -25,7 +25,7 @@ if (!$conex) {
 }
 
 //validar post
-$token = $_POST['token'];
+$token = $_COOKIE['token'];
 if (!$token) {
     echo json_encode(['error' => 'El token es obligatorio o inválido']);
     exit();

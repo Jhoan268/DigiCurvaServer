@@ -38,7 +38,24 @@ if (!$conex) {
 }
 
 // ✅ Obtener y sanitizar parámetros POST
-$usuario_id = filter_input(INPUT_POST, 'usuario_id', FILTER_VALIDATE_INT);
+$token = $_COOKIE['token'];
+if (!$token) {
+    echo json_encode(['error' => 'El token es obligatorio o inválido']);
+    exit();
+}
+// logica para obtener el token
+$private_key = file_get_contents('private_key.pem');
+$encryptedData = base64_decode($token);
+openssl_private_decrypt($encryptedData, $decrypted_data, $private_key);
+$disTokenJSON = json_decode($decrypted_data);
+//logica de verificacion del token
+$tokenExpire = $disTokenJSON['expiracion'];
+$timeActual = date("Y-m-d H:i:s");
+if (strtotime($tokenExpire) > strtotime($timeActual)){
+    echo json_encode(['error'=>'El token ya expiró, vuelve a iniciar sesion.']);
+    exit();
+}
+$usuario_id = (int)$disTokenJSON['id'];
 $nombre = filter_input(INPUT_POST, 'nombre', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 $correo = filter_input(INPUT_POST, 'correo', FILTER_VALIDATE_EMAIL);
 $contrasena_hash = filter_input(INPUT_POST, 'contrasena_hash', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
