@@ -103,13 +103,11 @@ $stmt->close();
             'httponly' => true,
             'samesite' => 'Strict'
         ]);
+        // ✅ Responder con mensaje de éxito
         echo json_encode([
             'success' => true,
-            'mensaje' => 'Autenticación exitosa'
+            'resultado' => 'Registro exitoso'
         ]);
-// ✅ Responder con mensaje de éxito (sin incluir el ID del usuario)
-echo json_encode(['resultado' => 'Registro exitoso']);
-
 // ✅ Cerrar conexión a la base de datos
 
 $conex->close();
