@@ -32,7 +32,24 @@ if (!$conex) {
 }
 
 // ✅ Obtener y sanitizar datos del formulario (POST)
-$usuario_id = filter_input(INPUT_POST, 'usuario_id', FILTER_VALIDATE_INT);
+$token = $_POST['token'];
+if (!$token) {
+    echo json_encode(['error' => 'El token es obligatorio o inválido']);
+    exit();
+}
+// logica para obtener el token
+$private_key = file_get_contents('private_key.pem');
+$encryptedData = base64_decode($token);
+openssl_private_decrypt($encryptedData, $decrypted_data, $private_key);
+$disTokenJSON = json_decode($decrypted_data);
+//logica de verificacion del token
+$tokenExpire = $disTokenJSON['expiracion'];
+$timeActual = date("Y-m-d H:i:s");
+if (strtotime($tokenExpire) > strtotime($timeActual)){
+    echo json_encode(['error'=>'El token ya expiró, vuelve a iniciar sesion.']);
+    exit();
+}
+$usuario_id = $disTokenJSON['id'];
 $titulo = filter_input(INPUT_POST, 'titulo', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 $mensaje = filter_input(INPUT_POST, 'mensaje', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 $fecha_inicio = filter_input(INPUT_POST, 'fecha_inicio', FILTER_SANITIZE_STRING);

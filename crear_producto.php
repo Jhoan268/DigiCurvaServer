@@ -32,7 +32,24 @@ if (!$conex) {
 }
 
 // ✅ Obtener y sanitizar datos del formulario (POST)
-$vendedor_id = filter_input(INPUT_POST, 'vendedor_id', FILTER_VALIDATE_INT);
+$token = $_POST['token'];
+if (!$token) {
+    echo json_encode(['error' => 'El token es obligatorio o inválido']);
+    exit();
+}
+// logica para obtener el token
+$private_key = file_get_contents('private_key.pem');
+$encryptedData = base64_decode($token);
+openssl_private_decrypt($encryptedData, $decrypted_data, $private_key);
+$disTokenJSON = json_decode($decrypted_data);
+//logica de verificacion del token
+$tokenExpire = $disTokenJSON['expiracion'];
+$timeActual = date("Y-m-d H:i:s");
+if (strtotime($tokenExpire) < strtotime($timeActual)){
+    echo json_encode(['error'=>'El token ya expiró, vuelve a iniciar sesion.']);
+    exit();
+}
+$vendedor_id = (int)$disTokenJSON['id'];
 $nombre = filter_input(INPUT_POST, 'nombre', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 $descripcion = filter_input(INPUT_POST, 'descripcion', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 $precio = filter_input(INPUT_POST, 'precio', FILTER_VALIDATE_FLOAT);

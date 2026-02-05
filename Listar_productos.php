@@ -25,7 +25,24 @@ if (!$conex) {
 }
 
 // ✅ Obtener y sanitizar parámetros POST
-$vendedor_id = filter_input(INPUT_POST, 'vendedor_id', FILTER_VALIDATE_INT);
+$token = $_POST['token'];
+if (!$token) {
+    echo json_encode(['error' => 'El token es obligatorio o inválido']);
+    exit();
+}
+// logica para obtener el token
+$private_key = file_get_contents('private_key.pem');
+$encryptedData = base64_decode($token);
+openssl_private_decrypt($encryptedData, $decrypted_data, $private_key);
+$disTokenJSON = json_decode($decrypted_data);
+//logica de verificacion del token
+$tokenExpire = $disTokenJSON['expiracion'];
+$timeActual = date("Y-m-d H:i:s");
+if (strtotime($tokenExpire) > strtotime($timeActual)){
+    echo json_encode(['error'=>'El token ya expiró, vuelve a iniciar sesion.']);
+    exit();
+}
+$vendedor_id = $disTokenJSON['id'];
 
 // ✅ Construir consulta base
 $query = "SELECT nombre, descripcion, precio, cantidad_existencia, fecha_publicacion, imagen_url FROM producto";

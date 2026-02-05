@@ -35,11 +35,11 @@ $private_key = file_get_contents('private_key.pem');
 $encryptedData = base64_decode($token);
 openssl_private_decrypt($encryptedData, $decrypted_data, $private_key);
 $disTokenJSON = json_decode($decrypted_data);
-$usuario_id = $disTokenJSON['id'];
+$usuario_id = (int)$disTokenJSON['id'];
 //logica de verificacion del token
 $tokenExpire = $disTokenJSON['expiracion'];
 $timeActual = date("Y-m-d H:i:s");
-if (strtotime($tokenExpiracion) > strtotime($timeActual)){
+if (strtotime($tokenExpire) < strtotime($timeActual)){
     echo json_encode(['error'=>'El token ya expiró, vuelve a iniciar sesion.']);
     exit();
 }
