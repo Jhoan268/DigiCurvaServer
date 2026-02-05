@@ -13,10 +13,16 @@ header("Content-Type: application/json");
  * Elimina este comentario una vez implementado.
  */
 // Conexión a la base de datos
-$user = 'droa';
-$server = 'localhost';
-$database = 'marketplace';
-$password = 'droaPluving$1';
+//Logica de acceso desde config.json
+// 1. Leer el archivo JSON
+$jsonString = file_get_contents('config.json');
+// 2. Decodificar el JSON en un array asociativo
+$data = json_decode($jsonString, true);
+// 3. Asignar las variables
+$user = $data["username"];
+$server = $data["host"];
+$database = $data["database"];
+$password = $data["password"];
 $conex = mysqli_connect($server, $user, $password, $database);
 
 if (!$conex) {
@@ -45,20 +51,24 @@ if ($result->num_rows === 1) {
     // ✅ Verificar la contraseña
     if (password_verify($contrasena, $usuario['contrasena_hash'])) {
         // ✅ Generar token de sesión
-        $token = bin2hex(random_bytes(32)); // 64 caracteres hexadecimales
-
-        // Opcional: guardar el token en la base de datos si deseas persistencia
-        // $stmt_token = $conex->prepare("UPDATE usuario SET token_sesion = ? WHERE id = ?");
-        // $stmt_token->bind_param("si", $token, $usuario['id']);
-        // $stmt_token->execute();
-        // $stmt_token->close();
-
+        $publicKey = file_get_contents('public_key.pem');
+        $tokenExpiracion = date("Y-m-d H:i:s",strtotime("+2 hours"));
+        $encodeJSON = json_encode([
+            'correo' => $correo,
+            'contrasena' => $contrasena,
+            'expiracion' => $tokenExpiracion
+        ]);
+        openssl_public_encrypt($encodeJSON,$token,$publicKey);
         echo json_encode([
             'success' => true,
             'mensaje' => 'Autenticación exitosa',
-            'usuario_id' => $usuario['usuario_id'],
-            'token' => $token
+            'token' => base64_encode($token)
         ]);
+        /**
+         * Use una encriptacion RSA para encriptar los datos y obtener el token
+         * el token tiene su hora de expiración de esta manera no se comprometen 
+         * los datos del usuario después de haber iniciado sesión.
+         */
     } else {
         echo json_encode(['error' => 'Contraseña incorrecta']);
     }
