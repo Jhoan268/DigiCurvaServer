@@ -35,7 +35,7 @@ if (!$conex) {
 
 $nombre = filter_input(INPUT_POST, 'nombre', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 $correo = filter_input(INPUT_POST, 'correo', FILTER_VALIDATE_EMAIL);
-$contrasena = filter_input(INPUT_POST, 'contrasena_hash', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+$contrasena_hash = filter_input(INPUT_POST, 'contrasena_hash', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 $direccion = filter_input(INPUT_POST, 'direccion', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 $telefono = filter_input(INPUT_POST, 'telefono', FILTER_SANITIZE_NUMBER_INT);
 $foto_perfil_url = filter_input(INPUT_POST, 'foto_perfil_url', FILTER_SANITIZE_URL);
@@ -76,7 +76,7 @@ if (!$foto_perfil_url) {
 
 // ✅ Generar hash seguro de la contraseña
 
-$contrasena_hash = password_hash($contrasena, PASSWORD_DEFAULT);
+$contrasena_hash = password_hash($contrasena_hash, PASSWORD_DEFAULT);
 
 // ✅ Preparar e insertar los datos del nuevo usuario en la base de datos
 
