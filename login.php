@@ -59,10 +59,18 @@ if ($result->num_rows === 1) {
             'expiracion' => $tokenExpiracion
         ]);
         openssl_public_encrypt($encodeJSON,$token,$publicKey);
+        //Guardo la cookie con el token encriptado
+        setcookie("token", $base64_encode($token), [
+            'expires' => time() + 7200,
+            'path' => '/',
+            'domain' => 'digicurva.local',
+            'secure' => true,
+            'httponly' => true,
+            'samesite' => 'Strict'
+        ]);
         echo json_encode([
             'success' => true,
-            'mensaje' => 'Autenticación exitosa',
-            'token' => base64_encode($token)
+            'mensaje' => 'Autenticación exitosa'
         ]);
         /**
          * Use una encriptacion RSA para encriptar los datos y obtener el token
