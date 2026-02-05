@@ -80,7 +80,7 @@ if ($result->num_rows === 1) {
         setcookie("token", $token, [
             'expires' => time() + 7200,
             'path' => '/',
-            'domain' => 'digicurva.local',
+            'domain' => 'xampp.local',
             'secure' => true,
             'httponly' => true,
             'samesite' => 'Strict'

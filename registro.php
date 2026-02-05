@@ -104,7 +104,7 @@ $stmt->close();
         setcookie("token", $token, [
             'expires' => time() + 7200,
             'path' => '/',
-            'domain' => 'digicurva.local',
+            'domain' => 'xampp.local',
             'secure' => true,
             'httponly' => true,
             'samesite' => 'Strict'
