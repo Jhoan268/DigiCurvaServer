@@ -23,7 +23,7 @@ if (!$conex) {
     echo json_encode(['error' => 'Conexión fallida: ' . mysqli_connect_error()]);
     exit();
 }
-
+try{
 // ✅ Consultar pedidos disponibles (sin repartidor asignado)
 $stmt = $conex->prepare("SELECT pedido_id, comprador_id, fecha_pedido, estado, direccion_envio, metodo_pago, punto_encuentro_acordado FROM pedido
     WHERE repartidor_id IS NULL");
@@ -45,4 +45,12 @@ echo json_encode([
     'success' => true,
     'pedidos_disponibles' => $pedidos_disponibles
 ]);
+} catch (Exception $e) {
+    echo json_encode([
+    'success' => false,
+    'error' => 'Error del servidor: ' . $e->getMessage()
+    ]);
+    $conex->close();
+    exit();
+}
 ?>

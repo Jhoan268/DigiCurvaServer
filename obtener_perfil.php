@@ -23,7 +23,7 @@ if (!$conex) {
     echo json_encode(['error' => 'Conexión fallida: ' . mysqli_connect_error()]);
     exit();
 }
-
+try{
 //validar post
 $token = $_COOKIE['token'];
 if (!$token) {
@@ -62,4 +62,12 @@ if ($result->num_rows === 1) {
 
 $stmt->close();
 $conex->close();
+} catch (Exception $e) {
+    echo json_encode([
+    'success' => false,
+    'error' => 'Error del servidor: ' . $e->getMessage()
+    ]);
+    $conex->close();
+    exit();
+}
 ?>

@@ -30,7 +30,7 @@ if (!$conex) {
     echo json_encode(['resultado' => "La conexión falló: " . mysqli_connect_error()]);
     exit();
 }
-
+try{
 // ✅ Obtener y sanitizar datos del formulario (POST)
 $token = $_COOKIE['token'];
 if (!$token) {
@@ -91,9 +91,19 @@ $stmt->execute();
 $stmt->close();
 
 // ✅ Responder con mensaje de éxito
-echo json_encode(['resultado' => 'Anuncio publicado exitosamente']);
+echo json_encode([
+    'success' => true,
+    'resultado' => 'Anuncio publicado exitosamente'
+]);
 
 // ✅ Cerrar conexión a la base de datos
 $conex->close();
-
+} catch (Exception $e) {
+    echo json_encode([
+    'success' => false,
+    'error' => 'Error del servidor: ' . $e->getMessage()
+    ]);
+    $conex->close();
+    exit();
+}   
 ?>

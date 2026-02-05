@@ -27,14 +27,19 @@ if (!$conex) {
     exit();
 }
 
-// ✅ Obtener y sanitizar datos del formulario (POST)
+try{
+// Recibir el cuerpo de la petición
+$jsonRecibido = file_get_contents('php://input');
 
-$nombre = filter_input(INPUT_POST, 'nombre', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-$correo = filter_input(INPUT_POST, 'correo', FILTER_VALIDATE_EMAIL);
-$contrasena_hash = filter_input(INPUT_POST, 'contrasena_hash', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-$direccion = filter_input(INPUT_POST, 'direccion', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-$telefono = filter_input(INPUT_POST, 'telefono', FILTER_SANITIZE_NUMBER_INT);
-$foto_perfil_url = filter_input(INPUT_POST, 'foto_perfil_url', FILTER_SANITIZE_URL);
+// Decodificar el JSON para convertirlo en un array de PHP
+$data = json_decode($jsonRecibido, true);
+// ✅ Obtener y sanitizar datos del formulario (POST)
+$nombre = filter_var($data['nombre'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+$correo = filter_var($data['correo'], FILTER_VALIDATE_EMAIL);
+$contrasena_hash = filter_var($data['contrasena_hash'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+$direccion = filter_var($data['direccion'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+$telefono = filter_var($data['telefono'], FILTER_SANITIZE_NUMBER_INT);
+$foto_perfil_url = filter_var($data['foto_perfil_url'], FILTER_SANITIZE_URL);
 
 // Inicializar karma en 0 por defecto
 $karma = 0;
@@ -109,7 +114,14 @@ $stmt->close();
             'resultado' => 'Registro exitoso'
         ]);
 // ✅ Cerrar conexión a la base de datos
-
 $conex->close();
-
+}
+catch(Exception $e){
+    echo json_encode([
+            'success' => false,
+            'resultado' => $e->getMessage()
+        ]);
+    $conex->close();
+    exit();
+}
 ?>

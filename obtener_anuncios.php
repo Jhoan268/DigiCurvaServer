@@ -23,7 +23,7 @@ if (!$conex) {
     echo json_encode(['error' => 'Conexión fallida: ' . mysqli_connect_error()]);
     exit();
 }
-
+try{
 // ✅ Consultar anuncios activos (fecha actual entre fecha_inicio y fecha_fin)
 $stmt = $conex->prepare(" SELECT  anuncio_id, usuario_id, titulo, mensaje, fecha_inicio, fecha_fin, costo
     FROM anuncio WHERE CURDATE() BETWEEN fecha_inicio AND fecha_fin ORDER BY fecha_inicio DESC
@@ -46,4 +46,12 @@ echo json_encode([
     'success' => true,
     'anuncios_activos' => $anuncio 
 ]);
+} catch (Exception $e) {
+    echo json_encode([
+    'success' => false,
+    'error' => 'Error del servidor: ' . $e->getMessage()
+    ]);
+    $conex->close();
+    exit();
+}
 ?>

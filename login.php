@@ -24,15 +24,19 @@ $server = $data["host"];
 $database = $data["database"];
 $password = $data["password"];
 $conex = mysqli_connect($server, $user, $password, $database);
-
+try{
 if (!$conex) {
     echo json_encode(['error' => 'Conexión fallida: ' . mysqli_connect_error()]);
     exit();
 }
+// Recibir el cuerpo de la petición
+$jsonRecibido = file_get_contents('php://input');
 
+// Decodificar el JSON para convertirlo en un array de PHP
+$data = json_decode($jsonRecibido, true);
 // ✅ Obtener y sanitizar parámetros POST
-$correo = filter_input(INPUT_POST, 'correo', FILTER_VALIDATE_EMAIL);
-$contrasena = filter_input(INPUT_POST, 'contrasena', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+$correo = filter_var($data['correo'], FILTER_VALIDATE_EMAIL);
+$contrasena = filter_var($data['contrasena'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
 if (!$correo || !$contrasena) {
     echo json_encode(['error' => 'Correo o contraseña inválidos']);
@@ -86,4 +90,9 @@ if ($result->num_rows === 1) {
 
 $stmt->close();
 $conex->close();
+} catch (Exception $e) {
+    echo json_encode(['error' => 'Error del servidor: ' . $e->getMessage()]);
+    $conex->close();
+    exit();
+}
 ?>

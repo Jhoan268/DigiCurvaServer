@@ -27,7 +27,7 @@ if (!$conex) {
     echo json_encode(['resultado' => "Error de conexión: " . mysqli_connect_error()]);
     exit();
 }
-
+try{
 // Obtener anuncio_id (POST o GET)
 $anuncio_id = filter_input(INPUT_POST, 'anuncio_id', FILTER_VALIDATE_INT);
 if (!$anuncio_id) {
@@ -59,4 +59,9 @@ $stmt->close();
 echo json_encode(['resultado' => "Actualizado correctamente"]);
 
 $conex->close();
+} catch (Exception $e) {
+    echo json_encode(['resultado' => 'Error del servidor: ' . $e->getMessage()]);
+    $conex->close();
+    exit();
+}
 ?>

@@ -23,7 +23,7 @@ if (!$conex) {
     echo json_encode(['error' => 'Conexión fallida: ' . mysqli_connect_error()]);
     exit();
 }
-
+try{
 // ✅ Obtener y sanitizar parámetro POST
 $producto_id = filter_input(INPUT_POST, 'producto_id', FILTER_VALIDATE_INT);
 
@@ -68,4 +68,12 @@ echo json_encode([
 ]);
 
 $conex->close();
+} catch (Exception $e) {
+    echo json_encode([
+    'success' => false,
+    'error' => 'Error del servidor: ' . $e->getMessage()
+    ]);
+    $conex->close();
+    exit();
+}
 ?>
