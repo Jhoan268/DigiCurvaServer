@@ -54,6 +54,7 @@ if ($result->num_rows === 1) {
         $publicKey = file_get_contents('public_key.pem');
         $tokenExpiracion = date("Y-m-d H:i:s",strtotime("+2 hours"));
         $encodeJSON = json_encode([
+            'id' => $usuario['usuario_id'],
             'correo' => $correo,
             'contrasena' => $contrasena,
             'expiracion' => $tokenExpiracion

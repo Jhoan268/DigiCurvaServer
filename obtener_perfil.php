@@ -24,11 +24,23 @@ if (!$conex) {
     exit();
 }
 
-// ✅ Obtener y sanitizar parámetro POST
-$usuario_id = filter_input(INPUT_POST, 'usuario_id', FILTER_VALIDATE_INT);
-
-if (!$usuario_id) {
-    echo json_encode(['error' => 'El parámetro usuario_id es obligatorio o inválido']);
+//validar post
+$token = $_POST['token'];
+if (!$token) {
+    echo json_encode(['error' => 'El token es obligatorio o inválido']);
+    exit();
+}
+// logica para obtener el token
+$private_key = file_get_contents('private_key.pem');
+$encryptedData = base64_decode($token);
+openssl_private_decrypt($encryptedData, $decrypted_data, $private_key);
+$disTokenJSON = json_decode($decrypted_data);
+$usuario_id = $disTokenJSON['id'];
+//logica de verificacion del token
+$tokenExpire = $disTokenJSON['expiracion'];
+$timeActual = date("Y-m-d H:i:s");
+if (strtotime($tokenExpiracion) > strtotime($timeActual)){
+    echo json_encode(['error'=>'El token ya expiró, vuelve a iniciar sesion.']);
     exit();
 }
 
