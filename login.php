@@ -36,7 +36,7 @@ $jsonRecibido = file_get_contents('php://input');
 $data = json_decode($jsonRecibido, true);
 // ✅ Obtener y sanitizar parámetros POST
 $correo = filter_var($data['correo'], FILTER_VALIDATE_EMAIL);
-$contrasena = filter_var($data['contrasena'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+$contrasena = $data['contrasena']; // No sanitizamos la contraseña para preservar su integridad);
 
 if (!$correo || !$contrasena) {
     echo json_encode(['error' => 'Correo o contraseña inválidos']);
