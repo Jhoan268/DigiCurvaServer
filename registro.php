@@ -100,7 +100,8 @@ $stmt->close();
         ]);
         openssl_public_encrypt($encodeJSON,$token,$publicKey);
         //Guardo la cookie con el token encriptado
-        setcookie("token", $base64_encode($token), [
+        $token = base64_encode($token); // Codificar el token en base64 para almacenarlo en la cookie
+        setcookie("token", $token, [
             'expires' => time() + 7200,
             'path' => '/',
             'domain' => 'digicurva.local',

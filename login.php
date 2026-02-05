@@ -24,23 +24,35 @@ $server = $data["host"];
 $database = $data["database"];
 $password = $data["password"];
 $conex = mysqli_connect($server, $user, $password, $database);
-try{
+
 if (!$conex) {
     echo json_encode(['error' => 'Conexión fallida: ' . mysqli_connect_error()]);
     exit();
 }
-// Recibir el cuerpo de la petición
+try{
+// 1. Recibir el cuerpo de la petición
 $jsonRecibido = file_get_contents('php://input');
-
-// Decodificar el JSON para convertirlo en un array de PHP
 $data = json_decode($jsonRecibido, true);
-// ✅ Obtener y sanitizar parámetros POST
-$correo = filter_var($data['correo'], FILTER_VALIDATE_EMAIL);
-$contrasena = $data['contrasena']; // No sanitizamos la contraseña para preservar su integridad);
 
-if (!$correo || !$contrasena) {
-    echo json_encode(['error' => 'Correo o contraseña inválidos']);
-    exit();
+// 2. Extraer datos del JSON (con fallback a vacío para evitar errores)
+$correoRaw = $data['correo'] ?? '';
+$contrasena = $data['contrasena'] ?? '';
+
+// 3. Validar y Sanitizar el Correo
+// filter_var devolverá el string del correo si es válido, o FALSE si no lo es.
+$correo = filter_var($correoRaw, FILTER_VALIDATE_EMAIL);
+
+if (!$correo) {
+    echo json_encode([
+        'success' => false, 
+        'error' => 'El formato del correo no es válido.'
+    ]);
+    exit;
+}
+
+if (empty($contrasena)) {
+    echo json_encode(['success' => false, 'error' => 'La contraseña es requerida.']);
+    exit;
 }
 // ✅ Buscar usuario por correo
 $stmt = $conex->prepare("SELECT usuario_id, contrasena_hash FROM usuario WHERE correo = ?");
@@ -64,7 +76,8 @@ if ($result->num_rows === 1) {
         ]);
         openssl_public_encrypt($encodeJSON,$token,$publicKey);
         //Guardo la cookie con el token encriptado
-        setcookie("token", $base64_encode($token), [
+        $token = base64_encode($token); // Codificar el token en base64 para almacenarlo en la cookie
+        setcookie("token", $token, [
             'expires' => time() + 7200,
             'path' => '/',
             'domain' => 'digicurva.local',
@@ -85,7 +98,7 @@ if ($result->num_rows === 1) {
         echo json_encode(['error' => 'Contraseña incorrecta']);
     }
 } else {
-    echo json_encode(['error' => 'Usuario no encontrado']);
+    echo json_encode(['error' => 'Usuario no encontrado: ' . $correo]);
 }
 
 $stmt->close();
