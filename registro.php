@@ -4,23 +4,19 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Headers: Content-Type");
 header("Content-Type: application/json");
-/**
- * La contraseña será cambiada por motivos de seguridad,
- * ahora el acceso será definido por un config.json
- * se deberá implementar la nueva lógica de acceso.
- * Si tienes alguna duda Jhoan la contraseña para ti 
- * en tu base de datos local será sin contraseña y el usuario
- * root.
- * Elimina este comentario una vez implementado.
- */
 // Habilitar reporte de errores de MySQLi para facilitar depuración
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 // Parámetros de conexión a la base de datos
-$server = 'localhost';
-$user = 'droa';
-$password = 'droaPluving$1';
-$database = 'marketplace';
+// 1. Leer el archivo JSON
+$jsonString = file_get_contents('config.json');
+// 2. Decodificar el JSON en un array asociativo
+$data = json_decode($jsonString, true);
+// 3. Asignar las variables
+$user = $data["username"];
+$server = $data["host"];
+$database = $data["database"];
+$password = $data["password"];
 
 // Establecer conexión con la base de datos
 $conex = mysqli_connect($server, $user, $password, $database);
@@ -88,8 +84,30 @@ $stmt->bind_param("ssssssi", $nombre, $correo, $contrasena_hash, $direccion, $te
 $stmt->execute();
 $stmt->close();
 
+// ✅ Generar token de sesión
+        $publicKey = file_get_contents('public_key.pem');
+        $tokenExpiracion = date("Y-m-d H:i:s",strtotime("+2 hours"));
+        $encodeJSON = json_encode([
+            'id' => $conex->insert_id,
+            'correo' => $correo,
+            'contrasena' => $contrasena_hash,
+            'expiracion' => $tokenExpiracion
+        ]);
+        openssl_public_encrypt($encodeJSON,$token,$publicKey);
+        //Guardo la cookie con el token encriptado
+        setcookie("token", $base64_encode($token), [
+            'expires' => time() + 7200,
+            'path' => '/',
+            'domain' => 'digicurva.local',
+            'secure' => true,
+            'httponly' => true,
+            'samesite' => 'Strict'
+        ]);
+        echo json_encode([
+            'success' => true,
+            'mensaje' => 'Autenticación exitosa'
+        ]);
 // ✅ Responder con mensaje de éxito (sin incluir el ID del usuario)
-
 echo json_encode(['resultado' => 'Registro exitoso']);
 
 // ✅ Cerrar conexión a la base de datos
