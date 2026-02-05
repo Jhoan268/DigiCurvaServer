@@ -105,9 +105,9 @@ $stmt->close();
             'expires' => time() + 7200,
             'path' => '/',
             'domain' => 'xampp.local',
-            'secure' => true,
+            'secure' => false,
             'httponly' => true,
-            'samesite' => 'Strict'
+            'samesite' => 'Lax'
         ]);
         // ✅ Responder con mensaje de éxito
         echo json_encode([

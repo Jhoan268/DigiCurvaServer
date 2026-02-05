@@ -81,9 +81,9 @@ if ($result->num_rows === 1) {
             'expires' => time() + 7200,
             'path' => '/',
             'domain' => 'xampp.local',
-            'secure' => true,
+            'secure' => false,
             'httponly' => true,
-            'samesite' => 'Strict'
+            'samesite' => 'Lax'
         ]);
         echo json_encode([
             'success' => true,

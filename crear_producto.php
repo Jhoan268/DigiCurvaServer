@@ -31,25 +31,49 @@ if (!$conex) {
     exit();
 }
 try{
-// ✅ Obtener y sanitizar datos del formulario (POST)
-$token = $_COOKIE['token'];
+// 1. Obtener el token de la cookie
+$token = $_COOKIE['token'] ?? null;
+
 if (!$token) {
-    echo json_encode(['error' => 'El token es obligatorio o inválido']);
+    echo json_encode(['success' => false, 'error' => 'Sesión no encontrada o expirada']);
     exit();
 }
-// logica para obtener el token
+
+// 2. Cargar clave privada
 $private_key = file_get_contents('private_key.pem');
 $encryptedData = base64_decode($token);
-openssl_private_decrypt($encryptedData, $decrypted_data, $private_key);
-$disTokenJSON = json_decode($decrypted_data);
-//logica de verificacion del token
-$tokenExpire = $disTokenJSON['expiracion'];
-$timeActual = date("Y-m-d H:i:s");
-if (strtotime($tokenExpire) < strtotime($timeActual)){
-    echo json_encode(['error'=>'El token ya expiró, vuelve a iniciar sesion.']);
+$decrypted_data = '';
+
+// 3. Desencriptar
+if (openssl_private_decrypt($encryptedData, $decrypted_data, $private_key)) {
+    
+    // IMPORTANTE: el segundo parámetro 'true' lo convierte en ARRAY asociativo
+    $disTokenJSON = json_decode($decrypted_data, true); 
+
+    if (!$disTokenJSON) {
+        echo json_encode(['success' => false, 'error' => 'Token corrupto']);
+        exit();
+    }
+
+    // 4. Lógica de verificación de expiración
+    $tokenExpire = $disTokenJSON['expiracion'];
+    $timeActual = date("Y-m-d H:i:s");
+
+    if (strtotime($tokenExpire) < strtotime($timeActual)) {
+        // Opcional: Borrar la cookie si ya expiró
+        setcookie("token", "", time() - 3600, "/"); 
+        echo json_encode(['success' => false, 'error' => 'El token ya expiró, vuelve a iniciar sesión.']);
+        exit();
+    }
+
+    // ✅ Token válido: aquí tienes tu ID listo
+    $vendedor_id = (int)$disTokenJSON['id'];
+
+} else {
+    echo json_encode(['success' => false, 'error' => 'No se pudo leer la identidad del token']);
     exit();
 }
-$vendedor_id = (int)$disTokenJSON['id'];
+
 $nombre = filter_input(INPUT_POST, 'nombre', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 $descripcion = filter_input(INPUT_POST, 'descripcion', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 $precio = filter_input(INPUT_POST, 'precio', FILTER_VALIDATE_FLOAT);

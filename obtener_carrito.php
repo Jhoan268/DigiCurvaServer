@@ -3,20 +3,16 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST");
 header("Access-Control-Allow-Headers: Content-Type");
 header("Content-Type: application/json");
-/**
- * La contraseña será cambiada por motivos de seguridad,
- * ahora el acceso será definido por un config.json
- * se deberá implementar la nueva lógica de acceso.
- * Si tienes alguna duda Jhoan la contraseña para ti 
- * en tu base de datos local será sin contraseña y el usuario
- * root.
- * Elimina este comentario una vez implementado.
- */
 // Conexión a la base de datos
-$user = 'droa';
-$server = 'localhost';
-$database = 'marketplace';
-$password = 'droaPluving$1';
+// 1. Leer el archivo JSON
+$jsonString = file_get_contents('config.json');
+// 2. Decodificar el JSON en un array asociativo
+$data = json_decode($jsonString, true);
+// 3. Asignar las variables
+$user = $data["username"];
+$server = $data["host"];
+$database = $data["database"];
+$password = $data["password"];
 $conex = mysqli_connect($server, $user, $password, $database);
 
 if (!$conex) {
@@ -24,25 +20,49 @@ if (!$conex) {
     exit();
 }
 try{
-// ✅ Obtener y sanitizar parámetro POST
-$token = $_COOKIE['token'];
+// 1. Obtener el token de la cookie
+$token = $_COOKIE['token'] ?? null;
+
 if (!$token) {
-    echo json_encode(['error' => 'El token es obligatorio o inválido']);
+    echo json_encode(['success' => false, 'error' => 'Sesión no encontrada o expirada']);
     exit();
 }
-// logica para obtener el token
+
+// 2. Cargar clave privada
 $private_key = file_get_contents('private_key.pem');
 $encryptedData = base64_decode($token);
-openssl_private_decrypt($encryptedData, $decrypted_data, $private_key);
-$disTokenJSON = json_decode($decrypted_data);
-//logica de verificacion del token
-$tokenExpire = $disTokenJSON['expiracion'];
-$timeActual = date("Y-m-d H:i:s");
-if (strtotime($tokenExpire) > strtotime($timeActual)){
-    echo json_encode(['error'=>'El token ya expiró, vuelve a iniciar sesion.']);
+$decrypted_data = '';
+
+// 3. Desencriptar
+if (openssl_private_decrypt($encryptedData, $decrypted_data, $private_key)) {
+    
+    // IMPORTANTE: el segundo parámetro 'true' lo convierte en ARRAY asociativo
+    $disTokenJSON = json_decode($decrypted_data, true); 
+
+    if (!$disTokenJSON) {
+        echo json_encode(['success' => false, 'error' => 'Token corrupto']);
+        exit();
+    }
+
+    // 4. Lógica de verificación de expiración
+    $tokenExpire = $disTokenJSON['expiracion'];
+    $timeActual = date("Y-m-d H:i:s");
+
+    if (strtotime($tokenExpire) < strtotime($timeActual)) {
+        // Opcional: Borrar la cookie si ya expiró
+        setcookie("token", "", time() - 3600, "/"); 
+        echo json_encode(['success' => false, 'error' => 'El token ya expiró, vuelve a iniciar sesión.']);
+        exit();
+    }
+
+    // ✅ Token válido: aquí tienes tu ID listo
+    $usuario_id = (int)$disTokenJSON['id'];
+
+} else {
+    echo json_encode(['success' => false, 'error' => 'No se pudo leer la identidad del token']);
     exit();
 }
-$usuario_id = $disTokenJSON['id'];
+
 
 if (!$usuario_id) {
     echo json_encode(['error' => 'El parámetro usuario_id es obligatorio o inválido']);
