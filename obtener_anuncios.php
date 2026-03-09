@@ -21,9 +21,24 @@ if (!$conex) {
 }
 try{
 // ✅ Consultar anuncios activos (fecha actual entre fecha_inicio y fecha_fin)
-$stmt = $conex->prepare(" SELECT  anuncio_id, usuario_id, titulo, mensaje, fecha_inicio, fecha_fin, costo
-    FROM anuncio WHERE CURDATE() BETWEEN fecha_inicio AND fecha_fin ORDER BY fecha_inicio DESC
-");
+$query = " SELECT  anuncio_id, usuario_id, titulo, mensaje, fecha_inicio, fecha_fin, costo, url_imagen
+    FROM anuncio WHERE fecha_fin >= CURRENT_DATE";
+$params = [];
+$types = "";
+$usuario_id = $_POST['id']??null;
+// ✅ Agregar filtro por vendedor_id si se proporciona
+if ($usuario_id != null) {
+    $query .= " AND usuario_id = ?";
+    $params[] = $usuario_id;
+    $types .= "i";
+}
+
+$stmt = $conex->prepare($query);
+
+// ✅ Asociar parámetros si existen
+if (!empty($params)) {
+    $stmt->bind_param($types, ...$params);
+}
 
 $stmt->execute();
 $result = $stmt->get_result();

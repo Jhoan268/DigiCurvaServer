@@ -67,7 +67,7 @@ if (openssl_private_decrypt($encryptedData, $decrypted_data, $private_key)) {
 
 
 // ✅ Consultar información del perfil
-$stmt = $conex->prepare("SELECT nombre, correo, direccion, telefono, foto_perfil_url FROM usuario WHERE usuario_id = ?");
+$stmt = $conex->prepare("SELECT usuario_id, nombre, correo, direccion, telefono, foto_perfil_url, coints, saldo FROM usuario WHERE usuario_id = ?");
 $stmt->bind_param("i", $usuario_id);
 $stmt->execute();
 $result = $stmt->get_result();

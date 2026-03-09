@@ -65,13 +65,12 @@ if (openssl_private_decrypt($encryptedData, $decrypted_data, $private_key)) {
 
 
 if (!$usuario_id) {
-    echo json_encode(['error' => 'El parámetro usuario_id es obligatorio o inválido']);
+    echo json_encode(['success' => false, 'error' => 'El parámetro usuario_id es obligatorio o inválido']);
     exit();
 }
 
 // ✅ Consultar contenido del carrito del usuario
-$stmt = $conex->prepare("
-    SELECT 
+$stmt = $conex->prepare("SELECT 
         carrito_compra.carrito_id,
         carrito_compra.producto_id,
         producto.nombre,
@@ -81,7 +80,7 @@ $stmt = $conex->prepare("
         producto.imagen_url
     FROM carrito_compra
     INNER JOIN producto ON carrito_compra.producto_id = producto.producto_id
-    WHERE carrito_compra.usuario_id = ?
+    WHERE carrito_compra.usuario_id = ? AND NOT  carrito_compra.status = 'pagado'
 ");
 $stmt->bind_param("i", $usuario_id);
 $stmt->execute();

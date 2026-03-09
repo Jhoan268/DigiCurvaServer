@@ -38,16 +38,17 @@ if (strtotime($tokenExpire) < strtotime($timeActual)){
     echo json_encode(['error'=>'El token ya expiró, vuelve a iniciar sesion.']);
     exit();
 }
-$vendedor_id = $disTokenJSON['id'];
+$vendedor_id = $_POST['id'] ?? null;
 
 // ✅ Construir consulta base
-$query = "SELECT nombre, descripcion, precio, cantidad_existencia, fecha_publicacion, imagen_url FROM producto";
+$query = "SELECT producto_id, nombre, descripcion, precio, cantidad_existencia, fecha_publicacion, imagen_url, categoria 
+FROM producto WHERE producto_id NOT IN (SELECT oferta.producto_id FROM oferta WHERE oferta.fecha_finalizacion >= CURRENT_DATE )";
 $params = [];
 $types = "";
 
 // ✅ Agregar filtro por vendedor_id si se proporciona
-if ($vendedor_id) {
-    $query .= " WHERE vendedor_id = ?";
+if ($vendedor_id != null) {
+    $query .= " AND vendedor_id = ?";
     $params[] = $vendedor_id;
     $types .= "i";
 }
