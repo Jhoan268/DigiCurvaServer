@@ -78,7 +78,9 @@ try {
     );
 
     if ($stmt->execute()) {
-        echo json_encode(['success' => true, 'resultado' => 'Producto creado exitosamente']);
+        $notif = '';
+        if ($activo == 1) {$notif = notificar($nombre,$imagen);}
+        echo json_encode(['success' => true, 'resultado' => 'Producto creado exitosamente', 'mensaje'=>$notif]);
     }
 
     $stmt->close();
@@ -87,5 +89,47 @@ try {
 } catch (Exception $e) {
     echo json_encode(['success' => false, 'error' => 'Error: ' . $e->getMessage()]);
     if (isset($conex)) $conex->close();
+}
+
+
+function notificar($nombre, $imagen):string{
+    // Datos que quieres enviar (el body del fetch)
+    $datos = [
+        "titulo"  => "¡Venden ".$nombre." en el tec!",
+        "mensaje" => "Es posible que se te antoje un '".$nombre."'",
+        "url"     => "http://xampp.local/DigiCurva-App/web/",
+        "icon"    => $imagen // Opcional
+    ];
+
+    // Convertir el array a JSON
+    $jsonDatos = json_encode($datos);
+
+    // URL de tu API (si está en la misma carpeta, usa la ruta completa o local)
+    $urlApi = "http://localhost/Implementacion-notificaciones-push/enviar_notificacion.php";
+
+    // Inicializar cURL
+    $ch = curl_init($urlApi);
+
+    // Configurar opciones de cURL
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonDatos);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Content-Type: application/json',
+        'Content-Length: ' . strlen($jsonDatos)
+    ]);
+
+    // Ejecutar la petición y obtener la respuesta
+    $respuesta = curl_exec($ch);
+
+    // Manejo de errores de conexión
+    if (curl_errno($ch)) {
+        return  'Error en cURL: ' . curl_error($ch);
+    } else {
+        return $respuesta;
+    }
+
+    // Cerrar conexión
+    curl_close($ch);
 }
 ?>
