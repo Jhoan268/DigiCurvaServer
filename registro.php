@@ -93,7 +93,7 @@ $contrasena_hash = password_hash($contrasena_hash, PASSWORD_DEFAULT);
 
 // ✅ Preparar e insertar los datos del nuevo usuario en la base de datos
 
-$stmt = $conex->prepare("INSERT INTO usuario (nombre, correo, contrasena_hash, direccion, telefono, foto_perfil_url, karma, apP, apM) VALUES (?, ?, ?, ?, ?, ?, ?,?,?)");
+$stmt = $conex->prepare("INSERT INTO usuario (nombre, correo, contrasena_hash, direccion, telefono, foto_perfil_url, karma, apP, apM, coints) VALUES (?, ?, ?, ?, ?, ?, ?,?,?,0)");
 $stmt->bind_param("ssssssiss", $nombre, $correo, $contrasena_hash, $direccion, $telefono, $foto_perfil_url, $karma, $apP, $apM);
 $stmt->execute();
 $stmt->close();
