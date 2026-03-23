@@ -4,7 +4,10 @@
 
 Este repositorio contiene el esquema de la base de datos MySQL para la plataforma de Marketplace, diseñada para manejar usuarios, productos, ventas (pedidos), logística (repartidores), y gestión de ofertas/anuncios.
 
-El proyecto requiere una`s ```private_key.pem``` y una ```public_key.pem``` y una configurarción ```config.js```:
+El proyecto requiere: 
+```private_key.pem``` 
+```public_key.pem``` 
+y una configurarción ```config.js```:
 ```
     "username": "root",
     "password": "",
