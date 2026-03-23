@@ -155,7 +155,7 @@ if (!$categoria) {
 }
 
 // ✅ Preparar e insertar los datos del nuevo producto en la base de datos
-$stmt = $conex->prepare("UPDATE producto SET nombre=?, descripcion=?, precio=?, cantidad_existencia=?, imagen_url=?, categoria=? WHERE id_vendedor  = ? AND id = ?");
+$stmt = $conex->prepare("UPDATE producto SET nombre=?, descripcion=?, precio=?, cantidad_existencia=?, imagen_url=?, categoria=? WHERE vendedor_id  = ? AND producto_id = ?");
 $stmt->bind_param("ssdissii", $nombre, $descripcion, $precio, $cantidad, $imagen_url, $categoria, $vendedor_id, $producto_id);
 $stmt->execute();
 $stmt->close();

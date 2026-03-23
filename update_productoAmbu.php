@@ -64,7 +64,7 @@ try {
 
     // 4. Preparar e Insertar
     // Nota: 'notificados' (default 0) y 'activo' (default 1) se omiten para usar sus valores por defecto
-    $stmt = $conex->prepare("UPDATE productos_ambulantes SET nombre=?, descripcion=?, precio=?, imagen=?, categoria=?, id_ubicacion=?, activo=?, WHERE vendedor_id  = ? AND producto_id = ?");
+    $stmt = $conex->prepare("UPDATE productos_ambulantes SET nombre=?, descripcion=?, precio=?, imagen=?, categoria=?, id_ubicacion=?, activo=? WHERE id_vendedor  = ? AND id = ?");
     
     // "ssdissi" -> string, string, double, string, string, int, int
     $stmt->bind_param("ssdssiiii", 

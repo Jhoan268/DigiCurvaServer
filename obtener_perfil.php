@@ -74,7 +74,8 @@ $result = $stmt->get_result();
 $stmt->close();
 if ($result->num_rows === 1) {
     $perfil = $result->fetch_assoc();
-    $stmt2 = $conex->prepare("SELECT solicitudes_compra.fecha_solicitud, productos_ambulantes.nombre, solicitudes_compra.statusd
+    $stmt2 = $conex->prepare("SELECT solicitudes_compra.fecha_solicitud, productos_ambulantes.nombre, solicitudes_compra.statusd, productos_ambulantes.imagen, 
+solicitudes_compra.cantidad
 FROM solicitudes_compra INNER JOIN productos_ambulantes ON productos_ambulantes.id = solicitudes_compra.id_producto
 WHERE solicitudes_compra.id_comprador = ?");
     $stmt2->bind_param("i", $usuario_id);
