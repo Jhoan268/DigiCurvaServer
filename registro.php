@@ -35,6 +35,8 @@ $jsonRecibido = file_get_contents('php://input');
 $data = json_decode($jsonRecibido, true);
 // ✅ Obtener y sanitizar datos del formulario (POST)
 $nombre = filter_var($data['nombre'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+$apP = filter_var($data['apP'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+$apM = filter_var($data['apM'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 $correo = filter_var($data['correo'], FILTER_VALIDATE_EMAIL);
 $contrasena_hash = filter_var($data['contrasena_hash'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 $direccion = filter_var($data['direccion'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
@@ -50,7 +52,14 @@ if (!$nombre) {
     echo json_encode(['resultado' => "El campo 'nombre' es obligatorio o inválido"]);
     exit();
 }
-
+if (!$apP) {
+    echo json_encode(['resultado' => "El campo 'apellido Paterno' es obligatorio o inválido"]);
+    exit();
+}
+if (!$apM) {
+    echo json_encode(['resultado' => "El campo 'apellido Materno' es obligatorio o inválido"]);
+    exit();
+}
 if (!$correo) {
     echo json_encode(['resultado' => "El campo 'correo' es obligatorio o inválido"]);
     exit();
@@ -84,8 +93,8 @@ $contrasena_hash = password_hash($contrasena_hash, PASSWORD_DEFAULT);
 
 // ✅ Preparar e insertar los datos del nuevo usuario en la base de datos
 
-$stmt = $conex->prepare("INSERT INTO usuario (nombre, correo, contrasena_hash, direccion, telefono, foto_perfil_url, karma) VALUES (?, ?, ?, ?, ?, ?, ?)");
-$stmt->bind_param("ssssssi", $nombre, $correo, $contrasena_hash, $direccion, $telefono, $foto_perfil_url, $karma);
+$stmt = $conex->prepare("INSERT INTO usuario (nombre, correo, contrasena_hash, direccion, telefono, foto_perfil_url, karma, apP, apM) VALUES (?, ?, ?, ?, ?, ?, ?,?,?)");
+$stmt->bind_param("ssssssiss", $nombre, $correo, $contrasena_hash, $direccion, $telefono, $foto_perfil_url, $karma, $apP, $apM);
 $stmt->execute();
 $stmt->close();
 

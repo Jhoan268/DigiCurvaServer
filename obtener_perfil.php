@@ -71,18 +71,28 @@ $stmt = $conex->prepare("SELECT usuario_id, nombre, correo, direccion, telefono,
 $stmt->bind_param("i", $usuario_id);
 $stmt->execute();
 $result = $stmt->get_result();
-
+$stmt->close();
 if ($result->num_rows === 1) {
     $perfil = $result->fetch_assoc();
+    $stmt2 = $conex->prepare("SELECT solicitudes_compra.fecha_solicitud, productos_ambulantes.nombre, solicitudes_compra.statusd
+FROM solicitudes_compra INNER JOIN productos_ambulantes ON productos_ambulantes.id = solicitudes_compra.id_producto
+WHERE solicitudes_compra.id_comprador = ?");
+    $stmt2->bind_param("i", $usuario_id);
+    $stmt2->execute();
+    $result2 = $stmt2->get_result();
+    $solicitudes = [];
+    while ($row = $result2->fetch_assoc()) {
+        $solicitudes[] = $row;
+    }
+    $stmt2->close();
     echo json_encode([
         'success' => true,
-        'perfil' => $perfil
+        'perfil' => $perfil,
+        'solicitudes' => $solicitudes
     ]);
 } else {
     echo json_encode(['error' => 'Usuario no encontrado']);
 }
-
-$stmt->close();
 $conex->close();
 } catch (Exception $e) {
     echo json_encode([

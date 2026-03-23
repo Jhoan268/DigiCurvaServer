@@ -15,6 +15,7 @@ $user = $data["username"];
 $server = $data["host"];
 $database = $data["database"];
 $password = $data["password"];
+$cookieDomain = ($data['domain'] == 'localhost') ? null : $data['domain'];
 $conex = mysqli_connect($server, $user, $password, $database);
 
 if (!$conex) {
@@ -72,7 +73,7 @@ if ($result->num_rows === 1) {
         setcookie("token", $token, [
             'expires' => time() + 7200,
             'path' => '/',
-            'domain' => 'xampp.local',
+            'domain' => $cookieDomain,
             'secure' => false,
             'httponly' => true,
             'samesite' => 'Lax'

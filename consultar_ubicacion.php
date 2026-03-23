@@ -20,25 +20,6 @@ if (!$conex) {
 }
 
 try {
-    // ✅ Verificación de Token
-    $token = $_COOKIE['token'] ?? null;
-    if (!$token) {
-        echo json_encode(['error' => 'El token es obligatorio o inválido']);
-        exit();
-    }
-
-    $private_key = file_get_contents('private_key.pem');
-    $encryptedData = base64_decode($token);
-    openssl_private_decrypt($encryptedData, $decrypted_data, $private_key);
-    $disTokenJSON = json_decode($decrypted_data, true);
-
-    $tokenExpire = $disTokenJSON['expiracion'];
-    $timeActual = date("Y-m-d H:i:s");
-    if (strtotime($tokenExpire) < strtotime($timeActual)){
-        echo json_encode(['error'=>'El token ya expiró, vuelve a iniciar sesion.']);
-        exit();
-    }
-
     // ✅ Consulta de Ubicaciones
     $query = "SELECT id, descripcion, x, y FROM ubicaciones";
     $result = mysqli_query($conex, $query);

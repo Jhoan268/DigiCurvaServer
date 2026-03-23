@@ -54,27 +54,29 @@ try {
     $categoria = filter_input(INPUT_POST, 'categoria', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $id_ubicacion = filter_input(INPUT_POST, 'id_ubicacion', FILTER_VALIDATE_INT);
     $activo = filter_input(INPUT_POST, 'activo', FILTER_VALIDATE_INT);
+    $producto_id = filter_input(INPUT_POST, 'producto_id', FILTER_VALIDATE_INT);
 
     // 3. Validaciones básicas
-    if (!$nombre || !$precio || !$categoria || !$id_ubicacion) {
+    if (!$nombre || !$precio || !$categoria || !$id_ubicacion || !$producto_id) {
         echo json_encode(['success' => false, 'error' => 'Faltan campos obligatorios']);
         exit();
     }
 
     // 4. Preparar e Insertar
     // Nota: 'notificados' (default 0) y 'activo' (default 1) se omiten para usar sus valores por defecto
-    $stmt = $conex->prepare("INSERT INTO productos_ambulantes (nombre, descripcion, precio, imagen, categoria, id_vendedor, id_ubicacion, activo) VALUES (?, ?, ?, ?, ?, ?, ?,?)");
+    $stmt = $conex->prepare("UPDATE productos_ambulantes SET nombre=?, descripcion=?, precio=?, imagen=?, categoria=?, id_ubicacion=?, activo=?, WHERE vendedor_id  = ? AND producto_id = ?");
     
     // "ssdissi" -> string, string, double, string, string, int, int
-    $stmt->bind_param("ssdssiii", 
+    $stmt->bind_param("ssdssiiii", 
         $nombre, 
         $descripcion, 
         $precio, 
         $imagen, 
         $categoria, 
-        $vendedor_id, 
         $id_ubicacion, 
-        $activo 
+        $activo,
+        $vendedor_id,
+        $producto_id
     );
 
     if ($stmt->execute()) {
