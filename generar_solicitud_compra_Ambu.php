@@ -17,7 +17,7 @@ $user = $data["username"];
 $server = $data["host"];
 $database = $data["database"];
 $password = $data["password"];
-
+$dominio = $data["domain"];
 // Establecer conexión con la base de datos
 $conex = mysqli_connect($server, $user, $password, $database);
 
@@ -96,7 +96,7 @@ $stmt->bind_param("iidssi", $id_producto,$id_ubicacion,$cantidad,$fecha_actual,$
 // ✅ Responder con mensaje de éxito
 if ($stmt->execute()) {
         $notif = '';
-        $notif = notificar($usuario_id);
+        $notif = notificar($usuario_id, $dominio);
         echo json_encode(['success' => true, 'resultado' => 'Solicitud de compra registrada exitosamente', 'mensaje'=>$notif]);
     }
     $stmt->close();
@@ -106,12 +106,12 @@ if ($stmt->execute()) {
     echo json_encode(['success' => false, 'error' => 'Error: ' . $e->getMessage()]);
     if (isset($conex)) $conex->close();
 }
-function notificar($usuario_id):string{
+function notificar($usuario_id, $dominio):string{
     // Datos que quieres enviar (el body del fetch)
     $datos = [
         "titulo"  => "Nueva solicitud de compra.",
         "mensaje" => "No pierdas a un cliente, mejor pierde la clase, es broma! solo atiende.",
-        "url"     => "http://xampp.local/DigiCurva-App/web/perfil.html",
+        "url"     => $dominio."/DigiCurva-App/web/perfil.html",
         "usuario_id" => $usuario_id
     ];
 
@@ -119,7 +119,7 @@ function notificar($usuario_id):string{
     $jsonDatos = json_encode($datos);
 
     // URL de tu API (si está en la misma carpeta, usa la ruta completa o local)
-    $urlApi = "http://localhost/Implementacion-notificaciones-push/enviar_notificacion.php";
+    $urlApi = $dominio."/Implementacion-notificaciones-push/enviar_notificacion.php";
 
     // Inicializar cURL
     $ch = curl_init($urlApi);

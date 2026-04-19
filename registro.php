@@ -42,6 +42,7 @@ $contrasena_hash = filter_var($data['contrasena_hash'], FILTER_SANITIZE_FULL_SPE
 $direccion = filter_var($data['direccion'], FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 $telefono = filter_var($data['telefono'], FILTER_SANITIZE_NUMBER_INT);
 $foto_perfil_url = filter_var($data['foto_perfil_url'], FILTER_SANITIZE_URL);
+$foto_perfil_url = $foto_perfil_url?? '';
 
 // Inicializar karma en 0 por defecto
 $karma = 0;
