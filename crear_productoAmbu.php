@@ -98,7 +98,7 @@ function notificar($nombre, $imagen, $dominio):string{
     $datos = [
         "titulo"  => "¡Venden ".$nombre." en el tec!",
         "mensaje" => "Es posible que se te antoje un '".$nombre."'",
-        "url"     => $dominio ."/DigiCurva-App/web/feed.html",
+        "url"     => "http://".$dominio ."/DigiCurva-App/web/feed.html",
         "icon"    => $imagen // Opcional
     ];
 
@@ -106,7 +106,7 @@ function notificar($nombre, $imagen, $dominio):string{
     $jsonDatos = json_encode($datos);
 
     // URL de tu API (si está en la misma carpeta, usa la ruta completa o local)
-    $urlApi = $dominio."/Implementacion-notificaciones-push/enviar_notificacion.php";
+    $urlApi = "http://".$dominio."/Implementacion-notificaciones-push/enviar_notificacion.php";
 
     // Inicializar cURL
     $ch = curl_init($urlApi);

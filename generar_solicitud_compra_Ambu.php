@@ -111,7 +111,7 @@ function notificar($usuario_id, $dominio):string{
     $datos = [
         "titulo"  => "Nueva solicitud de compra.",
         "mensaje" => "No pierdas a un cliente, mejor pierde la clase, es broma! solo atiende.",
-        "url"     => $dominio."/DigiCurva-App/web/perfil.html",
+        "url"     => "http://".$dominio."/DigiCurva-App/web/perfil.html",
         "usuario_id" => $usuario_id
     ];
 
@@ -119,7 +119,7 @@ function notificar($usuario_id, $dominio):string{
     $jsonDatos = json_encode($datos);
 
     // URL de tu API (si está en la misma carpeta, usa la ruta completa o local)
-    $urlApi = $dominio."/Implementacion-notificaciones-push/enviar_notificacion.php";
+    $urlApi = "http://".$dominio."/Implementacion-notificaciones-push/enviar_notificacion.php";
 
     // Inicializar cURL
     $ch = curl_init($urlApi);
