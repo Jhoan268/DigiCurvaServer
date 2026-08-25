@@ -63,7 +63,7 @@ if (openssl_private_decrypt($encryptedData, $decrypted_data, $private_key)) {
     $usuario_id = (int)$disTokenJSON['id'];
 
 } else {
-    echo json_encode(['success' => false, 'error' => 'No se pudo leer la identidad del token']);
+    echo json_encode(['success' => false, 'error' => 'No se pudo leer la identidad del token ']);
     exit();
 }
 

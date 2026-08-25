@@ -81,7 +81,7 @@ solicitudes_compra.cantidad, solicitudes_compra.fecha_solicitud FROM solicitudes
 INNER JOIN productos_ambulantes ON productos_ambulantes.id = solicitudes_compra.id_producto
 INNER JOIN ubicaciones ON ubicaciones.id = solicitudes_compra.id_ubicacion
 INNER JOIN usuario ON usuario.usuario_id = solicitudes_compra.id_comprador
-WHERE usuario.usuario_id = ? AND solicitudes_compra.statusd = 'sin_atender'");
+WHERE productos_ambulantes.id_vendedor = ? AND solicitudes_compra.statusd = 'sin_atender'");
 $stmt->bind_param("i", $usuario_id);
 //---------------------------------------------------------
 $stmt->execute();

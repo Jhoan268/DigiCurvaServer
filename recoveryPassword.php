@@ -35,8 +35,8 @@ try {
     // filter_var devolverá el string del correo si es válido, o FALSE si no lo es.
     $correo = filter_var($correoRaw, FILTER_VALIDATE_EMAIL);
     if (!$correo) {
-        echo json_encode(['success'=>false,'error'=>"faltan parametros", 'correo' => $_GET['correo']]);
-        exit;
+        echo json_encode(['success'=>false, 'error'=>"faltan parametros", 'correo' => $_GET['correo']]);
+        exit();
     }
     // 4. Preparar e Insertar
     // Nota: 'notificados' (default 0) y 'activo' (default 1) se omiten para usar sus valores por defecto
@@ -58,12 +58,12 @@ try {
         openssl_public_encrypt($encodeJSON,$token,$publicKey);
         //Guardo la cookie con el token encriptado
         $token = base64_encode($token); // Codificar el token en base64
-        $message = 'Si confirmas que deceas recuperar tu contraseña: '.$dominio.'/DigiCurva-App/Web/recoveryNewPassword.html?token='.$token;
+        $message = 'Si confirmas que deceas recuperar tu contraseña: http://'.$dominio.'/DigiCurva-App/Web/recoveryNewPassword.html?token='.$token;
         $sendmail = json_decode(setCorreo($usuario['nombre'],$correo,$message,$dominio),true);
         if (!$sendmail['success']) {
-            echo json_encode(['success' => false, 'error' => $sendmail['error']]);
+            echo json_encode(['success' => false, 'error' => $sendmail['error'] ?? 'error 64']);
         } else {
-            echo json_encode(['success' => true, 'resultado' => 'operación correcta', 'token' => $token, 'operacion'=>$sendmail]);
+            echo json_encode(['success' => true, 'resultado' => 'operación correcta', 'token' => $token, 'operacion'=>$sendmail['resultado']]);
         }
     } else {
         echo json_encode(['success' => false, 'error'  => 'no se encontró ninguna coincidencia']);
@@ -85,7 +85,7 @@ function setCorreo($nombre, $correo, $message, $dominio):string{
         "message" => $message
     ];
     // URL de tu API (si está en la misma carpeta, usa la ruta completa o local)
-    $urlApi = $dominio."/phpmailer-tutorial/sendJson.php";
+    $urlApi = "http://".$dominio."/phpmailer-tutorial/sendJson.php";
     // Inicializar cURL
     $ch = curl_init($urlApi);
     // Configurar opciones de cURL
@@ -102,6 +102,7 @@ function setCorreo($nombre, $correo, $message, $dominio):string{
     } else {
     // Cerrar conexión
     curl_close($ch);
+        echo "respuesta del correo: " . $respuesta; // Para depuración
         return (string)$respuesta;
     }
 }

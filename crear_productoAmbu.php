@@ -55,6 +55,20 @@ try {
     $categoria = filter_input(INPUT_POST, 'categoria', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $id_ubicacion = filter_input(INPUT_POST, 'id_ubicacion', FILTER_VALIDATE_INT);
     $activo = filter_input(INPUT_POST, 'activo', FILTER_VALIDATE_INT);
+    
+    // Recibir parámetros de horario
+    $prender = filter_input(INPUT_POST, 'prender', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $apagar = filter_input(INPUT_POST, 'apagar', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+
+    // Convertir strings vacíos a null para una correcta comparación
+    if (empty(trim((string)$prender))) $prender = null;
+    if (empty(trim((string)$apagar))) $apagar = null;
+
+    // Comprobador robusto (XOR): Si uno de los dos es null y el otro no, ambos se vuelven null
+    if (($prender === null) xor ($apagar === null)) {
+        $prender = null;
+        $apagar = null;
+    }
 
     // 3. Validaciones básicas
     if (!$nombre || !$precio || !$categoria || !$id_ubicacion) {
@@ -63,11 +77,11 @@ try {
     }
 
     // 4. Preparar e Insertar
-    // Nota: 'notificados' (default 0) y 'activo' (default 1) se omiten para usar sus valores por defecto
-    $stmt = $conex->prepare("INSERT INTO productos_ambulantes (nombre, descripcion, precio, imagen, categoria, id_vendedor, id_ubicacion, activo) VALUES (?, ?, ?, ?, ?, ?, ?,?)");
+    // Nota: 'notificados' (default 0) se omite, 'activo' se inserta, y añadimos hprendido y hapagado
+    $stmt = $conex->prepare("INSERT INTO productos_ambulantes (nombre, descripcion, precio, imagen, categoria, id_vendedor, id_ubicacion, activo, hprendido, hapagado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
     
-    // "ssdissi" -> string, string, double, string, string, int, int
-    $stmt->bind_param("ssdssiii", 
+    // "ssdssiiiss" -> string, string, double, string, string, int, int, int, string, string
+    $stmt->bind_param("ssdssiiiss", 
         $nombre, 
         $descripcion, 
         $precio, 
@@ -75,7 +89,9 @@ try {
         $categoria, 
         $vendedor_id, 
         $id_ubicacion, 
-        $activo 
+        $activo,
+        $prender,
+        $apagar
     );
 
     if ($stmt->execute()) {

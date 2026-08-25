@@ -15,8 +15,9 @@ $user = $data["username"];
 $server = $data["host"];
 $database = $data["database"];
 $password = $data["password"];
+$dominio = $data["domain"];
 $conex = mysqli_connect($server, $user, $password, $database);
-
+dispararSincronizacionSecreta($dominio);
 if (!$conex) {
     echo json_encode(['error' => 'Conexión fallida: ' . mysqli_connect_error()]);
     exit();
@@ -103,4 +104,22 @@ $conex->close();
     $conex->close();
     exit();
 }
+function dispararSincronizacionSecreta($dominio) {
+    // Ajusta la ruta correcta de tu script
+    $urlApi = "https://".$dominio."/DigiCurvaServer/update_activo_pambu.php"; 
+    
+    $ch = curl_init($urlApi);
+    
+    // Configuraciones clave para "disparar y olvidar"
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    // Le damos solo 100 milisegundos para conectar y enviar la petición
+    curl_setopt($ch, CURLOPT_TIMEOUT_MS, 100); 
+    
+    // Ejecutamos (fallará por el timeout corto, pero eso es exactamente lo que queremos)
+    curl_exec($ch);
+    curl_close($ch);
+}
+
+// Así lo llamas en tu código principal:
+// dispararSincronizacionSecreta($dominio);
 ?>
